@@ -217,3 +217,4 @@ __marimo__/
 *.bbl-SAVE-ERROR
 *.bbl
 *.aux
+*.synctex(busy)
