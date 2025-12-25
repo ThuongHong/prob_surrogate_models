@@ -1,0 +1,12 @@
+\section{Mô hình thay thế}
+Trước khi đi vào nội dung của Chương 18 - Mô hình thay thế xác suất, ta cần biết mô hình thay thế (surrogate model) là gì. (\cite{algforopt_ch17})
+
+Mô hình thay thế $\hat{f}$ là một hàm xấp xỉ toán học được thiết kế để mô phỏng hành vi của hàm mục tiêu thực $f$ nhưng với đặc tính mịn hơn và chi phí tính toán thấp hơn rất nhiều. Các mô hình này đóng vai trò quan trọng khi việc đánh giá hàm mục tiêu thực tế cực kỳ tốn kém, chẳng hạn như qua các thử nghiệm vật lý, mô phỏng siêu máy tính phức tạp hoặc huấn luyện mạng thần kinh sâu.
+
+Quá trình xây dựng một mô hình thay thế thường tuân theo các bước:
+\begin{itemize}
+    \item Lấy mẫu: Sử dụng các kế hoạch lấy mẫu (sampling plans) để thu thập dữ liệu ban đầu từ hàm mục tiêu thực.
+    \item Khớp mô hình (Fitting): Sử dụng các kỹ thuật hồi quy (regression) để điều chỉnh các tham số của mô hình sao cho sai số giữa giá trị dự đoán và giá trị thực tế là nhỏ nhất.
+    \item Sử dụng hàm cơ sở: Các mô hình phổ biến thường là tổ hợp tuyến tính của các hàm cơ sở (basis functions) như đa thức (polynoverfittingomial), hình sin (sinusoidal) hoặc các hàm hướng tâm (radial basis functions - RBF).
+    \item Lựa chọn mô hình: Để đảm bảo mô hình có khả năng dự đoán tốt trên dữ liệu mới (không bị overfitting), các kỹ thuật như kiểm chuẩn chéo (cross-validation) hoặc bootstrap được sử dụng để ước lượng sai số tổng quát hóa.
+\end{itemize}
