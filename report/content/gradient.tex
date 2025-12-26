@@ -1,0 +1,77 @@
+\section{Kết hợp thông tin gradient}
+Gaussian Process có thể được mở rộng để không chỉ học từ giá trị của hàm số mà còn học từ gradient của nó tại các điểm dữ liệu. Việc này giúp mô hình nắm bắt tốt hơn xu hướng thay đổi của hàm mục tiêu, đặc biệt hữu ích trong các không gian ít dữ liệu.
+
+\subsection{Mô hình Gaussian Process với gradient}
+Khi có thêm thông tin về gradient $\nabla \mathbf{y}$ tại các điểm dữ liệu $\mathbf{x}_i,(i=\overline{1,n})$, ta có thể mở rộng mô hình GP để bao gồm cả giá trị hàm và gradient:
+$$
+    \left[\begin{array}{c}
+            \mathbf{y} \\
+            \nabla \mathbf{y}
+        \end{array}\right] \sim \mathcal{N}\left(\left[\begin{array}{l}
+            \mathbf{m}_f \\
+            \mathbf{m}_{\nabla}
+        \end{array}\right],\left[\begin{array}{ll}
+            \mathbf{K}_{f f}      & \mathbf{K}_{f \nabla}      \\
+            \mathbf{K}_{\nabla f} & \mathbf{K}_{\nabla \nabla}
+        \end{array}\right]\right)
+$$
+Trong đó:
+\begin{itemize}
+    \item $\mathbf{m}_{\nabla}$ là hàm kỳ vọng của gradient.
+    \item $\mathbf{K}_{f\nabla}$ và $\mathbf{K}_{\nabla f}$ là các ma trận hiệp phương sai chéo giữa giá trị hàm và gradient.
+    \item $\mathbf{K}_{\nabla \nabla}$ là ma trận hiệp phương sai giữa các gradient.
+\end{itemize}
+
+\subsection{Tính toán ma trận hiệp phương sai cho gradient}
+Dựa vào tính chất đạo hàm là một phép toán tuyến tính, ta có thể suy ra các hàm hiệp phương sai liên quan đến gradient từ hàm hiệp phương sai ban đầu $k(\mathbf{x}, \mathbf{x}')$:
+\begin{align*}
+    k_{ff}\left(\mathbf{x},\mathbf{x}'\right)            & =k\left(\mathbf{x},\mathbf{x}'\right)                                        \\
+    k_{\nabla f}\left(\mathbf{x},\mathbf{x}'\right)      & =\nabla_{\mathbf{x}}k\left(\mathbf{x},\mathbf{x}'\right)                     \\
+    k_{f \nabla}\left(\mathbf{x},\mathbf{x}'\right)      & =\nabla_{\mathbf{x}'}k\left(\mathbf{x},\mathbf{x}'\right)                    \\
+    k_{\nabla \nabla}\left(\mathbf{x},\mathbf{x}'\right) & =\nabla_{\mathbf{x}}\nabla_{\mathbf{x}'}k\left(\mathbf{x},\mathbf{x}'\right) \\
+\end{align*}
+\subsection{Phân phối đồng thời với gradient}
+Để dự đoán tại tập điểm mới $X^*$, ta thiết lập phân phối đồng thời giữa giá trị dự đoán $\hat{\mathbf{y}}$ và toàn bộ dữ liệu quan sát (bao gồm cả $\mathbf{y}$ và $\nabla \mathbf{y}$):
+
+$$
+    \begin{bmatrix}
+        \hat{\mathbf{y}} \\
+        \mathbf{y}       \\
+        \nabla \mathbf{y}
+    \end{bmatrix}
+    \sim
+    \mathcal{N}
+    \left(
+    \begin{bmatrix}
+            \mathbf{m}_f(X^*) \\
+            \mathbf{m}_f(X)   \\
+            \mathbf{m}_{\nabla f}(X)
+        \end{bmatrix},
+    \begin{bmatrix}
+            \mathbf{K}_{ff}(X^*, X^*)     & \mathbf{K}_{ff}(X^*, X)     & \mathbf{K}_{f\nabla}(X^*, X)    \\
+            \mathbf{K}_{ff}(X, X^*)       & \mathbf{K}_{ff}(X, X)       & \mathbf{K}_{f\nabla}(X, X)      \\
+            \mathbf{K}_{\nabla f}(X, X^*) & \mathbf{K}_{\nabla f}(X, X) & \mathbf{K}_{\nabla\nabla}(X, X)
+        \end{bmatrix}
+    \right)
+$$
+
+
+\subsection{Phân phối hậu nghiệm với gradient}
+Ta có thể suy ra phân phối hậu nghiệm cho $\hat{\mathbf{y}}$ dựa trên toàn bộ dữ liệu quan sát.
+
+$$
+    \hat{\mathbf{y}}\mid \mathbf{y},\nabla \mathbf{y} \sim \mathcal{N}(\boldsymbol{\mu}_{\nabla},\Sigma_{\nabla})
+$$
+Trong đó:
+\begin{itemize}
+    \item Kỳ vọng hậu nghiệm:$$\boldsymbol{\mu}_{\nabla}=\mathbf{m}(X^*)+\mathbf{K}(X^*,X)(\mathbf{K}(X,X)+\nu \mathbf{I})^{-1}(\mathbf{y}-\mathbf{m}(X))$$
+    \item Hiệp phương sai hậu nghiệm:$$\boldsymbol{\Sigma}_{\nabla}=\mathbf{K}(X^*,X^*)-\mathbf{K}(X^*,X)(\mathbf{K}(X,X)+\nu \mathbf{I})^{-1}\mathbf{K}(X,X^*)$$
+\end{itemize}
+
+Hình \ref{fig:gradient_gp} minh họa kết quả dự đoán sử dụng Gaussian Process khi có thông tin về gradient. Ta có thể thấy rằng việc bổ sung thông tin gradient giúp mô hình GP nắm bắt tốt hơn các biến đổi của hàm mục tiêu.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/gp_with_gradient.png}
+    \caption{Dự đoán với Gaussian Process có thông tin gradient}
+    \label{fig:gradient_gp}
+\end{figure}

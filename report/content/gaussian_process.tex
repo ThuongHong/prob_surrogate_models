@@ -1,0 +1,63 @@
+\section{Gaussian Process}
+Xét tập dữ liệu huấn luyện $\mathcal{D} = \{(\mathbf{x}_i, y_i) \mid i = 1, \dots, n\}$, trong đó $X = [\mathbf{x}_1, \dots, \mathbf{x}_n]^\top$ là ma trận các vector đầu vào và $\mathbf{y} = [y_1, \dots, y_n]^\top$ là vector các giá trị mục tiêu (targets) tương ứng.
+
+Một Gaussian Process (GP) được định nghĩa là một phân phối trên các hàm số (distribution over functions). Một GP được xác định hoàn toàn bởi hàm kì vọng (mean function) $m(\mathbf{x})$ và hàm hiệp phương sai (covariance function/kernel) $k(\mathbf{x}, \mathbf{x}')$:
+$$
+    \left[\begin{array}{c}
+            y_1    \\
+            \vdots \\
+            y_{n}
+        \end{array}\right] \sim \mathcal{N}\left(\left[\begin{array}{c}
+            m\left(\mathbf{x}_1\right) \\
+            \vdots                     \\
+            m\left(\mathbf{x}_n\right)
+        \end{array}\right],\left[\begin{array}{ccc}
+            k\left(\mathbf{x}_1, \mathbf{x}_1\right) & \cdots & k\left(\mathbf{x}_1, \mathbf{x}_n\right) \\
+            \vdots                                   & \ddots & \vdots                                   \\
+            k\left(\mathbf{x}_n, \mathbf{x}_1\right) & \cdots & k\left(\mathbf{x}_n, \mathbf{x}_n\right)
+        \end{array}\right]\right)
+$$
+hay viết gọn hơn là:
+$$
+    f(\mathbf{x}) \sim \mathcal{GP}(m(\mathbf{x}), k(\mathbf{x}, \mathbf{x}'))
+$$
+Trong đó:
+\begin{itemize}
+    \item Hàm kì vọng $m(\mathbf{x})$ là giá trị trung bình của hàm số tại điểm đầu vào $\mathbf{x}$:
+          $$ m(\mathbf{x}) = \mathbb{E}[f(\mathbf{x})] $$
+          Hàm kì vọng có thể thể hiện kiến thức tiên nghiệm (prior knowledge) về hàm số, thường được giả định là hàm không (zero function) trong nhiều ứng dụng.
+    \item Hàm hiệp phương sai $k(\mathbf{x}, \mathbf{x}')$ biểu diễn mối quan hệ giữa các giá trị hàm số tại hai điểm đầu vào khác nhau:
+          $$ k(\mathbf{x}, \mathbf{x}') = \mathbb{E}\left[(f(\mathbf{x}) - m(\mathbf{x}))(f(\mathbf{x}') - m(\mathbf{x}'))\right] $$
+          Hàm hiệp phương sai quyết định độ mượt (smoothness) và cấu trúc của các hàm số được mô hình hóa bởi GP.
+\end{itemize}
+
+\subsection*{Hàm hiệp phương sai}
+Một hàm hiệp phương sai thường dùng là hàm mũ bình phương (squared exponential kernel):
+$$
+    k\left(\mathbf{x}, \mathbf{x}^{\prime}\right)=\exp \left(-\frac{\left\|\mathbf{x}-\mathbf{x}^{\prime}\right\|^2}{2 \ell^2}\right)
+$$
+Trong đó, $\ell$ là chiều dài đặc trưng (length-scale) điều khiển mức độ ảnh hưởng của các điểm dữ liệu lân cận đến giá trị hàm số tại một điểm cụ thể. $\ell$ càng nhỏ thì hàm số càng biến động nhanh, trong khi $\ell$ càng lớn thì hàm số càng mượt (xem Hình \ref{fig:gp_length_scales} và Hình \ref{fig:gp_2d_samples}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/gp_samples_length_scales.png}
+    \caption{Các mẫu hàm số (1 chiều) được sinh từ Gaussian Process với các giá trị chiều dài đặc trưng $\ell$ khác nhau}
+    \label{fig:gp_length_scales}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/gp_2d_samples.png}
+    \caption{Các mẫu hàm số (2 chiều) được sinh từ Gaussian Process với các giá trị chiều dài đặc trưng $\ell$ khác nhau}
+    \label{fig:gp_2d_samples}
+\end{figure}
+
+\pagebreak
+Ngoài ra, còn có nhiều hàm hiệp phương sai khác như hàm tuyến tính (linear kernel), hàm Matern (Matern kernel), và hàm thừa số (periodic kernel), mỗi hàm có các đặc tính riêng phù hợp với các loại dữ liệu và ứng dụng khác nhau. Hình \ref{fig:different_kernel_functions} minh họa các mẫu hàm số được sinh từ GP với các hàm hiệp phương sai khác nhau.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/different_kernel_functions.png}
+    \caption{Các mẫu hàm số được sinh từ Gaussian Process với các hàm hiệp phương sai khác nhau}
+    \label{fig:different_kernel_functions}
+\end{figure}

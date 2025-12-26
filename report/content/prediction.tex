@@ -1,0 +1,82 @@
+\pagebreak
+\section{Dự đoán với Gaussian Process}
+
+Một mô hình GP cho bài toán hồi quy thường bao gồm thành phần nhiễu (noise) trong quá trình quan sát. Cụ thể, mô hình được định nghĩa bởi các thành phần sau:
+\begin{enumerate}
+    \item Hàm kỳ vọng (mean function) $m(\mathbf{x})$: Xu hướng chung của dữ liệu (thường giả định $m(\mathbf{x}) = 0$ để đơn giản hóa).
+    \item Hàm hiệp phương sai (covariance function/kernel) $k(\mathbf{x},\mathbf{x}')$: Quy định độ trơn và hình dáng của các hàm số.
+    \item Dữ liệu huấn luyện $\mathcal{D} = (X, \mathbf{y})$: Các cặp input-output đã quan sát được.
+    \item Phương sai nhiễu $\nu$: Độ lớn của nhiễu quan sát. (sẽ được trình bày trong phần sau)
+\end{enumerate}
+
+\subsection{Phân phối đồng thời}
+Giả sử ta muốn dự đoán giá trị đầu ra $\hat{\mathbf{y}}$ tại tập điểm $X^*$. Phân phối đồng thời (joint distribution) giữa dữ liệu quan sát $\mathbf{y}$ và giá trị dự đoán $\hat{\mathbf{y}}$ được mô hình hóa như sau:
+
+$$
+    \left[\begin{array}{l}
+            \hat{\mathbf{y}} \\
+            \mathbf{y}
+        \end{array}\right] \sim \mathcal{N}\left(\left[\begin{array}{l}
+            \mathbf{m}\left(X^*\right) \\
+            \mathbf{m}(X)
+        \end{array}\right],\left[\begin{array}{ll}
+            \mathbf{K}\left(X^*, X^*\right) & \mathbf{K}\left(X^*, X\right) \\
+            \mathbf{K}\left(X, X^*\right)   & \mathbf{K}(X, X)
+        \end{array}\right]\right) \label{eq:joint_distribution}
+$$
+
+Trong đó:
+\begin{itemize}
+    \item $\mathbf{m}(X)$ và $\mathbf{m}(X^*)   $ là các vector kỳ vọng tại các điểm trong tập huấn luyện và tập dự đoán.
+    \item $\mathbf{K}(X, X)$, $\mathbf{K}(X^*, X)$, $\mathbf{K}(X, X^*)$, và $\mathbf{K}(X^*, X^*)$ là các ma trận hiệp phương sai được xây dựng từ hàm hiệp phương sai $k(\mathbf{x}, \mathbf{x}')$.
+\end{itemize}
+
+Cụ thể, các hàm trên được tính như sau:
+$$
+    \begin{aligned}
+        \mathbf{m}(X)                        & =\left[m\left(\mathbf{x}_{1}\right), \ldots, m\left(\mathbf{x}_{n}\right)\right]                                                                                  \\
+        \mathbf{K}\left(X, X^{\prime}\right) & =\left[\begin{array}{ccc}
+                                                              k\left(\mathbf{x}_{1}, \mathbf{x}^{\prime}_{1}\right) & \cdots & k\left(\mathbf{x}_{1}, \mathbf{x}^{\prime}_{|X^{\prime}|}\right) \\
+                                                              \vdots                                                & \ddots & \vdots                                                           \\
+                                                              k\left(\mathbf{x}_{n}, \mathbf{x}^{\prime}_{1}\right) & \cdots & k\left(\mathbf{x}_{n}, \mathbf{x}^{\prime}_{|X^{\prime}|}\right)
+                                                          \end{array}\right]
+    \end{aligned}
+$$
+
+\subsection{Phân phối hậu nghiệm}
+Phân phối dự đoán của $\hat{\mathbf{y}}$ khi biết dữ liệu quan sát $\mathbf{y}$:
+$$
+    \hat{\mathbf{y}} \mid \mathbf{y} \sim \mathcal{N}(\underbrace{\mathbf{m}\left(X^*\right)+\mathbf{K}\left(X^*, X\right) \mathbf{K}(X, X)^{-1}(\mathbf{y}-\mathbf{m}(X))}_{\text {kì vọng }}, \underbrace{\mathbf{K}\left(X^*, X^*\right)-\mathbf{K}\left(X^*, X\right) \mathbf{K}(X, X)^{-1} \mathbf{K}\left(X, X^*\right)}_{\text {hiệp phương sai }})
+$$
+Phân phối trên được gọi là phân phối hậu nghiệm (posterior distribution) của mô hình GP.
+
+Khi dự đoán tại một điểm mới $\mathbf{x}$, ta có thể quan tâm đến các đại lượng sau:
+\begin{itemize}
+    \item Kì vọng dự đoán: Đây là giá trị trung bình của hàm tại điểm $\mathbf{x}$, đại diện cho ước lượng tốt nhất của mô hình:
+          $$
+              \begin{aligned}
+                  \hat{\boldsymbol{\mu}}(\mathbf{x}) & =m(\mathbf{x})+\mathbf{K}(\mathbf{x}, X) \mathbf{K}(X, X)^{-1}(\mathbf{y}-\mathbf{m}(X)) \\
+                                                     & =m(\mathbf{x})+\mathbf{\Theta}^{\top} \mathbf{K}(X, \mathbf{x})
+              \end{aligned}
+          $$
+          Trong đó, vector trọng số $\Theta=\mathbf{K}(X,X)^{-1}(\mathbf{y}-\mathbf{m}(X))$ có thể được tính toán trước để tái sử dụng, giúp tăng tốc độ dự đoán cho các giá trị $\mathbf{x}$ khác nhau.
+
+    \item Phương sai dự đoán: Thước đo độ bất định (uncertainty) của dự đoán. Giá trị này phụ thuộc hoàn toàn vào hàm hiệp phương sai và vị trí của các điểm dữ liệu $\mathbf{x}$, không phụ thuộc vào giá trị quan sát $\mathbf{y}$:
+          $$ \hat{v}(\mathbf{x}) = k(\mathbf{x}, \mathbf{x}) - \mathbf{K}(\mathbf{x}, X) [\mathbf{K}(X, X) + \nu\mathbf{I}]^{-1} \mathbf{K}(X, \mathbf{x}) $$
+
+    \item Độ lệch chuẩn và Khoảng tin cậy: GP sử dụng độ lệch chuẩn dự đoán $\hat{\sigma}(\mathbf{x})=\sqrt{\hat{v}(\mathbf{x})}$ để xây dựng các khoảng tin cậy (confidence regions).
+
+          Khoảng tin cậy là một phạm vi giá trị được xây dựng xung quanh dự đoán, thể hiện mức độ chắc chắn của mô hình. Ví dụ: Thay vì đưa ra một giá trị đơn lẻ, mô hình chỉ ra rằng với xác suất 95\%, giá trị thực sẽ nằm trong khoảng $[y_{\min}, y_{\max}]$.
+
+          Độ lệch chuẩn có cùng đơn vị với kì vọng. Từ độ lệch chuẩn, ta có thể tính toán khoảng tin cậy 95\% (tức khoảng giá trị chứa 95\% hàm phân phối tích lũy). Với một điểm $\mathbf{x}$ cho trước, khoảng này được xác định bởi:
+          $$ \hat{\mu}(\mathbf{x}) \pm 1.96\hat{\sigma}(\mathbf{x}) $$
+          Độ rộng của khoảng tin cậy tỉ lệ thuận với độ lệch chuẩn $\hat{\sigma}(\mathbf{x})$.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/gp_regression_fitting.png}
+    \caption{Dự đoán với Gaussian Process}
+    \label{fig:gp-prediction}
+\end{figure}
+Quan sát hình \ref{fig:gp-prediction}, ta có thể thấy cách một mô hình GP điều chỉnh kì vọng và khoảng tin cậy dựa trên dữ liệu quan sát. Các điểm màu đen biểu diễn dữ liệu huấn luyện, đường màu xanh lam là kì vọng dự đoán, và vùng bóng xung quanh thể hiện khoảng tin cậy 95\%. Khi gần các điểm dữ liệu, mô hình trở nên chắc chắn hơn (khoảng tin cậy hẹp lại), trong khi ở những vùng xa dữ liệu, độ bất định tăng lên (khoảng tin cậy rộng hơn).

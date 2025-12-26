@@ -1,0 +1,47 @@
+\section{Huấn luyện Gaussian Process}
+
+Hiệu suất của mô hình GP phụ thuộc rất lớn vào việc lựa chọn hàm hiệp phương sai và các tham số đi kèm (bao gồm các siêu tham số của hàm hiệp phương sai $\Theta$ và phương sai nhiễu $\nu$).
+
+Thông thường, các tham số này có thể được lựa chọn bằng phương pháp cross-validation. Tuy nhiên, đối với GP, phương pháp phổ biến và hiệu quả hơn là tối đa hóa hàm log hợp lý (log likelihood). Thay vì tối thiểu hóa sai số bình phương (squared error), ta tìm tập tham số $\Theta$ và $\nu$ sao cho xác suất quan sát được dữ liệu $p(\mathbf{y} \mid X, \Theta, \nu)$ là lớn nhất.
+
+\subsection{Hàm log hợp lý}
+Cho tập dữ liệu $\mathcal{D}$ gồm $n$ phần tử quan sát. Đặt $\boldsymbol{\Sigma}_{\Theta} = \mathbf{K}_{\Theta}(X, X) + \nu \mathbf{I}$ là ma trận hiệp phương sai của dữ liệu có nhiễu. Log likelihood được xác định bởi công thức:
+
+$$
+    \log p(\mathbf{y} \mid X, \nu, \Theta) =
+    \underbrace{-\frac{1}{2} (\mathbf{y} - \mathbf{m}_{\Theta}(X))^{\top} \boldsymbol{\Sigma}_{\Theta}^{-1} (\mathbf{y} - \mathbf{m}_{\Theta}(X))}_{\text{Độ khớp dữ liệu (Data fit)}}
+    \underbrace{-\frac{1}{2} \log | \boldsymbol{\Sigma}_{\Theta} |}_{\text{Độ phức tạp (Complexity penalty)}}
+    -\frac{n}{2} \log 2\pi
+$$
+
+Trong đó:
+\begin{itemize}
+    \item Thành phần đầu tiên đo lường mức độ phù hợp của mô hình với dữ liệu (Data fit).
+    \item Thành phần thứ hai đóng vai trò như một hình thức kiểm soát độ phức tạp (Complexity penalty), ngăn mô hình rơi vào overfitting.
+\end{itemize}
+
+\subsection{Tối ưu hóa tham số}
+Giả sử ta sử dụng hàm kỳ vọng bằng 0 ($\mathbf{m}_{\Theta}(X) = \mathbf{0}$), khi đó $\Theta$ chỉ còn ảnh hưởng đến hàm hiệp phương sai. Các siêu tham số (hyperparameters) của GP có thể được ước lượng bằng phương pháp Ước lượng hợp lý cực đại (Maximum Likelihood Estimation - MLE) thông qua thuật toán Gradient Ascent.
+
+Đạo hàm riêng của log likelihood theo một tham số $\Theta_j$ được tính như sau:
+
+$$
+    \frac{\partial}{\partial \Theta_j}
+    \log p(\mathbf{y} \mid X, \Theta)
+    =
+    \frac{1}{2}
+    \mathbf{y}^{\top}
+    \mathbf{K}^{-1}
+    \frac{\partial \mathbf{K}}{\partial \Theta_j}
+    \mathbf{K}^{-1}
+    \mathbf{y}
+    -
+    \frac{1}{2}
+    \operatorname{tr}
+    \left(
+    \mathbf{\Sigma}_{\Theta}^{-1}
+    \frac{\partial \mathbf{K}}{\partial \Theta_j}
+    \right)
+$$
+
+Việc tính toán gradient này cho phép ta cập nhật các siêu tham số $\Theta$ (như length-scale $\ell$, signal variance $\sigma_f^2$) và phương sai nhiễu $\nu$ để mô hình GP phù hợp nhất với dữ liệu huấn luyện.

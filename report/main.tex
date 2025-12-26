@@ -17,12 +17,6 @@
 % To use roman section / subsection, uncomment these rows
 % \renewcommand{\thesection}{\Roman{section}}
 % \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
-% =========== ADDITIONAL PACKAGES ===========
-\usepackage{tikz}
-\usetikzlibrary{shapes, arrows, positioning, calc}
-\usepackage{float} % Để dùng [H] cho figure
-\usepackage{algorithm}
-\usepackage{algpseudocode}
 % ===========================================
 
 % Define course name, report name and report title.
@@ -60,14 +54,14 @@ Trường Đại học Khoa học Tự nhiên - ĐHQG HCM\\
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-\include{content/surrogate_models.tex}
-\include{content/gaussian_distribution.tex}
-\include{content/gaussian_process.tex}
-\include{content/prediction.tex}
-\include{content/gradient.tex}
-\include{content/noisy.tex}
-\include{content/fitting.tex}
-
+\input{content/surrogate_models.tex}
+\input{content/gaussian_distribution.tex}
+\input{content/gaussian_process.tex}
+\input{content/prediction.tex}
+\input{content/gradient.tex}
+\input{content/noisy.tex}
+\input{content/fitting.tex}
+\input{content/summary.tex}
 
 
 % References

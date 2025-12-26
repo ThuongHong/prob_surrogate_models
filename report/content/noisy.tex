@@ -1,0 +1,50 @@
+\section{Kết hợp thông tin nhiễu}
+\subsection{Mô hình Gaussian Process với nhiễu}
+
+Trong các ứng dụng thực tế, các quan sát từ hàm mục tiêu $f$ thường không chính xác tuyệt đối mà bị ảnh hưởng bởi nhiễu. Ta mô hình hóa quá trình này thông qua công thức:
+$$
+    y = f(\mathbf{x}) + z
+$$
+Trong đó, $f(\mathbf{x})$ là giá trị tất định của hàm số, và $z$ là nhiễu Gaussian độc lập có kỳ vọng bằng 0 (zero-mean Gaussian noise), tức $z \sim \mathcal{N}(0, \nu)$. Tham số phương sai nhiễu $\nu$ đóng vai trò quan trọng trong việc kiểm soát độ "mượt" của mô hình và tránh hiện tượng overfitting.
+
+\subsection{Phân phối đồng thời với nhiễu}
+Khi bao gồm nhiễu trong mô hình GP, phân phối đồng thời giữa dữ liệu quan sát $\mathbf{y}$ và giá trị dự đoán $\hat{\mathbf{y}}$ được điều chỉnh như sau:
+
+$$
+    \left[\begin{array}{l}
+            \hat{\mathbf{y}} \\
+            \mathbf{y}
+        \end{array}\right] \sim \mathcal{N}\left(\left[\begin{array}{l}
+            \mathbf{m}\left(X^*\right) \\
+            \mathbf{m}(X)
+        \end{array}\right],\left[\begin{array}{ll}
+            \mathbf{K}\left(X^*, X^*\right) & \mathbf{K}\left(X^*, X\right)   \\
+            \mathbf{K}\left(X, X^*\right)   & \mathbf{K}(X, X)+\nu \mathbf{I}
+        \end{array}\right]\right)
+$$
+Để ý rằng công thức trên giống với phân phối đồng thời ban đầu \ref{eq:joint_distribution}, nhưng ma trận hiệp phương sai của dữ liệu quan sát $\mathbf{y}$ được cộng thêm một thành phần $\nu \mathbf{I}$ để phản ánh sự hiện diện của nhiễu Gaussian độc lập với phương sai $\nu$.
+
+\subsection{Phân phối hậu nghiệm với nhiễu}
+Phân phối hậu nghiệm cho $\hat{\mathbf{y}}$ khi biết dữ liệu quan sát $\mathbf{y}$ trở thành:
+$$
+    \hat{\mathbf{y}}\mid \mathbf{y},\nu \sim \mathcal{N}(\boldsymbol{\mu}^*,\Sigma^*)
+$$
+Trong đó:
+\begin{itemize}
+    \item Kì vọng hậu nghiệm:
+          $$
+              \boldsymbol{\mu}^*=\mathbf{m}(X^*)+\mathbf{K}(X^*,X)(\mathbf{K}(X,X)+\nu \mathbf{I})^{-1}(\mathbf{y}-\mathbf{m}(X))
+          $$
+    \item Hiệp phương sai hậu nghiệm:
+          $$
+              \boldsymbol{\Sigma}^*=\mathbf{K}(X^*,X^*)-\mathbf{K}(X^*,X)(\mathbf{K}(X,X)+\nu \mathbf{I})^{-1}\mathbf{K}(X,X^*)
+          $$
+\end{itemize}
+
+Hình \ref{fig:noisy_gp} minh họa kết quả dự đoán sử dụng Gaussian Process khi dữ liệu quan sát bị nhiễu. Ta có thể thấy rằng mô hình GP vẫn có khả năng nắm bắt xu hướng chung của hàm mục tiêu mặc dù dữ liệu bị ảnh hưởng bởi nhiễu.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/gp_noisy_observations.png}
+    \caption{Dự đoán với Gaussian Process có thông tin nhiễu}
+    \label{fig:noisy_gp}
+\end{figure}

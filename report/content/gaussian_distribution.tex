@@ -1,0 +1,45 @@
+\section[Phân phối Gaussian]{Phân phối Gaussian\footnote{Nội dung các mục trong báo cáo này được trình bày lại dựa trên Chương 18 của cuốn sách \textit{Algorithms for Optimization} \cite{algforopt}.}}
+Một phân phối Gaussian (phân phối chuẩn) $n$-biến được đặc trưng bởi vector kì vọng $\boldsymbol{\mu}$ và ma trận hiệp phương sai $\boldsymbol{\Sigma}$. Mật độ xác suất tại $\mathbf{x}$ được định nghĩa là:
+$$
+    \mathcal{N}(\mathbf{x} \mid \boldsymbol{\mu}, \boldsymbol{\Sigma}) = (2 \pi)^{-n / 2}|\boldsymbol{\Sigma}|^{-1 / 2} \exp \left(-\frac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^{\top} \boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})\right)
+$$
+
+Một vector ngẫu nhiên $\mathbf{x}$ tuân theo phân phối chuẩn được ký hiệu là:
+$$
+    \mathbf{x} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})
+$$
+
+%Figure 18.1 shows contour plots of the density functions with different covariance matrices. Covariance matrices are always positive semidefinite. 
+Hình \ref{fig:multivariate_normal_distributions} minh họa các đường đồng mức của các hàm mật độ xác suất với các ma trận hiệp phương sai khác nhau. Ma trận hiệp phương sai luôn là ma trận nửa xác định dương (positive semidefinite).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/multivariate_normal_distributions.png}
+    \caption{Các phân phối Gaussian đa biến với các ma trận hiệp phương sai khác nhau}
+    \label{fig:multivariate_normal_distributions}
+\end{figure}
+
+Xét hai vector ngẫu nhiên Gaussian đồng thời (jointly Gaussian) $\mathbf{a}$ và $\mathbf{b}$, phân phối đồng thời của chúng có dạng:
+$$
+    \begin{bmatrix}\mathbf{a}\\\mathbf{b}\end{bmatrix} \sim \mathcal{N}\left(
+    \begin{bmatrix}\boldsymbol{\mu}_{\mathbf{a}}\\\boldsymbol{\mu}_{\mathbf{b}}\end{bmatrix},
+    \begin{bmatrix}\mathbf{A} & \mathbf{C}\\\mathbf{C}^{\top} & \mathbf{B}\end{bmatrix}
+    \right)
+$$
+Trong đó $\mathbf{A}$ và $\mathbf{B}$ là ma trận hiệp phương sai của riêng $\mathbf{a}$ và $\mathbf{b}$, còn $\mathbf{C}$ là ma trận hiệp phương sai chéo.
+
+Phân phối biên (marginal distribution) của từng vector thành phần được xác định bởi:
+$$
+    \mathbf{a} \sim \mathcal{N}(\boldsymbol{\mu}_{\mathbf{a}}, \mathbf{A}), \quad \mathbf{b} \sim \mathcal{N}(\boldsymbol{\mu}_{\mathbf{b}}, \mathbf{B})
+$$
+
+Phân phối có điều kiện (conditional distribution) của $\mathbf{a}$ khi biết trước $\mathbf{b}$ cũng là một phân phối Gaussian:
+$$
+    \mathbf{a} \mid \mathbf{b} \sim \mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{a} \mid \mathbf{b}}, \boldsymbol{\Sigma}_{\mathbf{a} \mid \mathbf{b}}\right)
+$$
+Các tham số của phân phối này được tính theo công thức dạng đóng (closed-form):
+\begin{itemize}
+    \item Vector kì vọng có điều kiện:
+          $$ \boldsymbol{\mu}_{\mathbf{a} \mid \mathbf{b}} = \boldsymbol{\mu}_{\mathbf{a}} + \mathbf{C}\mathbf{B}^{-1}(\mathbf{b} - \boldsymbol{\mu}_{\mathbf{b}}) $$
+    \item Ma trận hiệp phương sai có điều kiện:
+          $$ \boldsymbol{\Sigma}_{\mathbf{a} \mid \mathbf{b}} = \mathbf{A} - \mathbf{C}\mathbf{B}^{-1}\mathbf{C}^{\top} $$
+\end{itemize}
