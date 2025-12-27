@@ -1,0 +1,106 @@
+\section{Bài tập}
+
+\subsection{Bài 18.1}
+\textbf{Câu hỏi:} Các Gaussian Process (GP) sẽ tăng độ phức tạp trong quá trình tối ưu hóa khi số lượng mẫu tích lũy nhiều hơn. Điều này mang lại lợi thế gì so với việc sử dụng các mô hình dựa trên hồi quy (regression)?
+
+\textbf{Trả lời:}
+Lợi thế chính là tính linh hoạt (flexibility). Các mô hình hồi quy tham số thông thường bị giới hạn bởi số lượng tham số cố định, dễ dẫn đến hiện tượng underfitting (nếu mô hình quá đơn giản) hoặc overfitting (nếu quá phức tạp). Ngược lại, GP là mô hình phi tham số (non-parametric), cho phép độ phức tạp của mô hình thích nghi và tăng lên tương ứng với lượng dữ liệu quan sát được, giúp mô hình hóa chính xác các hàm số phức tạp mà không cần giả định trước về dạng hàm quá cứng nhắc.
+
+\subsection{Bài 18.2}
+\textbf{Câu hỏi:} Độ phức tạp tính toán của việc dự đoán với Gaussian Process tăng như thế nào theo số lượng điểm dữ liệu $m$?
+
+\textbf{Trả lời:}
+Chi phí tính toán bị chi phối bởi việc nghịch đảo ma trận hiệp phương sai (covariance matrix) kích thước $m \times m$.
+\begin{itemize}
+    \item \textbf{Huấn luyện (Fitting):} Tốn $\mathcal{O}(m^3)$ để phân rã Cholesky hoặc nghịch đảo ma trận.
+    \item \textbf{Dự đoán (Prediction):} Tốn $\mathcal{O}(m)$ để tính giá trị trung bình và $\mathcal{O}(m^2)$ để tính phương sai cho mỗi điểm dự đoán mới.
+\end{itemize}
+
+\subsection{Bài 18.3}
+\textbf{Câu hỏi:} Xét hàm số $f(x) = \sin(x) / (x^2 + 1)$ trên đoạn $[-5, 5]$.
+\begin{itemize}
+    \item Độ lệch chuẩn lớn nhất trong phân phối dự đoán trên đoạn $[-5, 5]$ là bao nhiêu khi dùng GP có thông tin đạo hàm tại 5 điểm $\{-5, -2.5, 0, 2.5, 5\}$?
+    \item Cần bao nhiêu đánh giá hàm số (không có đạo hàm) để đạt được cùng độ lệch chuẩn tối đa đó?
+\end{itemize}
+
+\textbf{Trả lời:}
+\begin{itemize}
+    \item Độ lệch chuẩn tối đa khi sử dụng thông tin đạo hàm tại 5 điểm là xấp xỉ \textbf{0.377}.
+    \item Để đạt được độ chính xác tương đương (độ lệch chuẩn $\leq 0.377$) mà không dùng thông tin đạo hàm, cần khoảng \textbf{8} điểm đánh giá hàm số được phân bố đều. Điều này cho thấy giá trị của thông tin gradient trong việc giảm độ không chắc chắn.
+\end{itemize}
+
+\subsection{Bài 18.4}
+\textbf{Câu hỏi:} Chứng minh hệ thức sau cho hàm hiệp phương sai với thông tin đạo hàm:
+\[ k_{f\nabla}(x, x')_i = \text{cov}\left(f(x), \frac{\partial}{\partial x'_i} f(x')\right) = \frac{\partial}{\partial x'_i} k_{ff}(x, x') \]
+
+\textbf{Trả lời:}
+Dựa vào tính chất tuyến tính của kỳ vọng ($\mathbb{E}$) và phép đạo hàm:
+\[
+    \begin{aligned}
+        \text{cov}\left(f(x), \frac{\partial f(x')}{\partial x'_i}\right) & = \mathbb{E}\left[ (f(x) - \mu(x)) \left( \frac{\partial f(x')}{\partial x'_i} - \frac{\partial \mu(x')}{\partial x'_i} \right) \right] \\
+                                                                          & = \mathbb{E}\left[ (f(x) - \mu(x)) \frac{\partial}{\partial x'_i} (f(x') - \mu(x')) \right]                                             \\
+                                                                          & = \frac{\partial}{\partial x'_i} \mathbb{E}\left[ (f(x) - \mu(x)) (f(x') - \mu(x')) \right]                                             \\
+                                                                          & = \frac{\partial}{\partial x'_i} k_{ff}(x, x')
+    \end{aligned}
+\]
+
+\subsection{Bài 18.5}
+\textbf{Câu hỏi:} Chứng minh rằng phương sai của phân phối có điều kiện trên $a$ khi biết $b$ không lớn hơn phương sai biên trên $a$. Ý nghĩa trực quan là gì?
+
+\textbf{Trả lời:}
+Công thức phương sai có điều kiện là:
+\[ \Sigma_{a|b} = \Sigma_{aa} - \Sigma_{ab}\Sigma_{bb}^{-1}\Sigma_{ba} \]
+Vì ma trận hiệp phương sai luôn xác định dương (hoặc bán xác định dương), cụm $\Sigma_{ab}\Sigma_{bb}^{-1}\Sigma_{ba}$ tương ứng là một đại lượng không âm. Do đó $\Sigma_{a|b} \leq \Sigma_{aa}$.
+\textbf{Ý nghĩa:} Việc quan sát thêm dữ liệu ($b$) luôn cung cấp thông tin, làm giảm (hoặc giữ nguyên) mức độ không chắc chắn (phương sai) về các biến còn lại ($a$).
+
+\subsection{Bài 18.6}
+\textbf{Câu hỏi:} Nếu quan sát thấy nhiều giá trị ngoại lai (outliers) nằm ngoài khoảng tin cậy của GP, ta có thể làm gì để khắc phục?
+
+\textbf{Trả lời:}
+\begin{enumerate}
+    \item \textbf{Điều chỉnh Kernel:} Chọn một hàm kernel khác phù hợp hơn với cấu trúc dữ liệu thực tế.
+    \item \textbf{Thêm nhiễu (Noise term):} Mô hình hóa dữ liệu dưới dạng $y = f(x) + \epsilon$ với $\epsilon \sim \mathcal{N}(0, \sigma_n^2)$. Việc tăng $\sigma_n$ sẽ nới rộng khoảng tin cậy quanh các điểm dữ liệu.
+    \item \textbf{Dùng Likelihood mạnh (Robust Likelihood):} Thay thế phân phối Gaussian bằng phân phối có đuôi nặng hơn (như t-student) để giảm sự nhạy cảm với các điểm dữ liệu bất thường.
+\end{enumerate}
+
+\subsection{Bài 18.7}
+\textbf{Câu hỏi:} Sửa đổi phương trình phân phối đồng thời để hỗ trợ mô hình đa độ tin cậy (multifidelity) với dữ liệu thấp ($y_\ell$) và cao ($y_h$).
+
+\textbf{Trả lời:}
+Mô hình giả định $f_h(x) = \rho f_\ell(x) + \delta(x)$. Phân phối đồng thời của $y = [y_\ell, y_h]^\top$ sẽ có ma trận hiệp phương sai dạng khối:
+\[
+    K = \begin{bmatrix}
+        k_{\ell\ell}(X_\ell, X_\ell)   & \rho k_{\ell\ell}(X_\ell, X_h)                             \\
+        \rho k_{\ell\ell}(X_h, X_\ell) & \rho^2 k_{\ell\ell}(X_h, X_h) + k_{\delta\delta}(X_h, X_h)
+    \end{bmatrix}
+\]
+Trung bình dự đoán tại điểm mới $x^*$ được tính bằng công thức chuẩn của GP: $\mu(x^*) = k_*^\top K^{-1} y$, trong đó vector $k_*$ chứa độ tương quan giữa $x^*$ và tất cả các điểm $X_\ell, X_h$.
+
+\subsection{Bài 18.8}
+\textbf{Câu hỏi:} Huấn luyện mô hình GP cho dữ liệu:
+\[ X = [-1.5, -1.0, -0.75, -0.4, -0.25, 0.0] \]
+\[ Y = [-1.66, -0.264, 1.05, 1.36, 0.99, 0.22] \]
+Sử dụng hàm trung bình đa thức bậc 5 và squared exponential kernel ($\ell=0.25$).
+
+\textbf{Trả lời:}
+Thực hiện hồi quy đa thức bậc 5 trên dữ liệu để tìm vector tham số $\theta$. Hàm trung bình $m(x)$ sẽ là đa thức này. Sau đó xây dựng GP với kernel $k(x, x') = \sigma^2 \exp(-\frac{(x-x')^2}{2\ell^2})$. Kết quả là một mô hình đường cong đi qua các điểm dữ liệu nhưng có xu hướng trở về dạng đa thức bậc 5 khi ở xa điểm dữ liệu.
+
+\subsection{Bài 18.9}
+\textbf{Câu hỏi:} Mở rộng bài 18.8 bằng cách kết hợp thêm dữ liệu độ tin cậy cao:
+\[ X_h = [-0.7, 0.5, 0.9], \quad Y_h = [-0.220, -0.737, -1.449] \]
+Dùng $m_\ell(x)$ làm hàm cơ sở và mô hình trung bình $m_h(x) = \theta_1 m_\ell(x) + \theta_2 + \theta_3 x + \theta_4 x^2$.
+
+\textbf{Trả lời:}
+Sử dụng hồi quy tuyến tính trên dữ liệu $Y_h$ để ước lượng các hệ số $\theta$ (bao gồm $\theta_1$ là hệ số tỉ lệ $\rho$ và các hệ số bias). Kết quả mô hình GP đa độ tin cậy sẽ tin tưởng vào dữ liệu $Y_h$ hơn tại các điểm quan sát được, và sử dụng thông tin từ mô hình độ tin cậy thấp ($Y_\ell$) để dẫn hướng ở những vùng chưa có dữ liệu cao.
+
+\subsection{Bài 18.10}
+\textbf{Câu hỏi:} Sử dụng kiểm chứng chéo leave-one-out (leave-one-out cross-validation) để chọn kernel tốt nhất cho tập dữ liệu $\{(1, 0), (2, -1), (3, -2), (4, 1), (5, 0)\}$.
+
+\textbf{Trả lời:}
+Với mỗi loại kernel (ví dụ: Squared Exponential, Matern, v.v.):
+\begin{enumerate}
+    \item Lần lượt bỏ ra 1 điểm dữ liệu, dùng $n-1$ điểm còn lại để huấn luyện GP.
+    \item Tính log-likelihood (xác suất) của điểm bị bỏ ra dựa trên mô hình đó.
+    \item Cộng tổng log-likelihood cho tất cả các điểm.
+\end{enumerate}
+Chọn kernel có tổng log-likelihood lớn nhất. Với dữ liệu dao động mạnh như trên, kernel Squared Exponential thường không tốt bằng kernel Matern (ít trơn hơn).
