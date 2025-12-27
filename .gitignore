@@ -218,3 +218,4 @@ __marimo__/
 *.bbl
 *.aux
 *.synctex(busy)
+*.lof

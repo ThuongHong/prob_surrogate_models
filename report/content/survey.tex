@@ -1,0 +1,23 @@
+\section{Các hướng nghiên cứu gần đây}
+
+Trong giai đoạn 2023--2025, cộng đồng nghiên cứu Gaussian Process (GP) tập trung giải quyết các vấn đề về tính bền vững, tích hợp cấu trúc hình học/tô pô và khả năng kết hợp với các mô hình Generative AI hiện đại. Các hướng đi chính bao gồm:
+
+\begin{itemize}
+    \item \textbf{Tính Bền Vững và Phát Hiện Nhiễu (Robustness):}
+          Nghiên cứu tập trung vào việc xử lý dữ liệu nhiễu ngoại lai (outliers) mà không làm mất đi tính lồi của hàm mục tiêu. Nổi bật là phương pháp \textit{Relevance Pursuit} (RRP) \cite{ament2025robustgaussianprocessesrelevance}, sử dụng tham số nhiễu riêng biệt cho từng điểm dữ liệu và chứng minh được tính lồi mạnh (strong convexity) của hàm log-hợp lý biên âm, giúp tối ưu hóa hiệu quả hơn các phương pháp biến phân trước đây.
+
+    \item \textbf{Gaussian Process Hình Học (Geometric GPs):}
+          Mở rộng GP sang các không gian phi Euclidean. \textit{GPUM} \cite{niu2023intrinsicgaussianprocessunknown} đề xuất mô hình GP nội tại trên các đa tạp ẩn (unknown manifolds) bằng cách học metric tensor xác suất và xấp xỉ nhân nhiệt (heat kernel) thông qua mô phỏng chuyển động Brown, thay vì dùng khoảng cách Euclidean truyền thống.
+
+    \item \textbf{Gaussian Process Tô Pô (Topological GPs):}
+          Ứng dụng lý thuyết Hodge để mô hình hóa dữ liệu dạng luồng (flow) trên các phức hợp đơn hình (simplicial complexes). \textit{Hodge-Compositional Edge GPs} \cite{yang2024hodgecompositionaledgegaussianprocesses} cho phép phân rã trường vector thành các thành phần gradient, curl và harmonic, giúp tích hợp các kiến thức vật lý (như bảo toàn khối lượng) vào nhân GP.
+
+    \item \textbf{Deep Gaussian Processes (Deep GPs):}
+          Cải thiện kiến trúc để tránh suy thoái tín hiệu khi tăng độ sâu. Mô hình \textit{Thin and Deep GP} \cite{desouza2023deepgaussianprocesses} sử dụng các biến đổi tuyến tính cục bộ để điều biến trường độ dài (lengthscale), giúp bảo toàn cấu trúc metric qua nhiều lớp. Ngoài ra, các phương pháp suy diễn mới như \textit{Diffusion VI} \cite{xu2024sparseinducingpointsdeep} sử dụng mô hình khuếch tán để xấp xỉ hậu nghiệm phức tạp của các biến ẩn.
+
+    \item \textbf{Tích hợp với Generative AI:}
+          Sử dụng GP làm phân phối tiền nghiệm (prior) cho các mô hình sinh hiện đại. Ví dụ, \textit{TSFlow} \cite{kollovieh2025flowmatchinggaussianprocess} dùng GP để định hướng quá trình Flow Matching trong dự báo chuỗi thời gian, giúp quỹ đạo học được trơn tru và tuân thủ tính chất thời gian tốt hơn so với nhiễu trắng chuẩn.
+
+    \item \textbf{Tối ưu hóa Bayes Cao Chiều (High-dimensional BO):}
+          Tranh luận về hiệu quả của GP tiêu chuẩn so với các phương pháp dựa trên VAE. Nghiên cứu mới tại ICLR 2025 \cite{xu2025standardgaussianprocessneed} chỉ ra rằng Standard GP với nhân Matérn và khởi tạo hợp lý vẫn hoạt động tốt trong không gian cao chiều, thách thức quan điểm cần phải giảm chiều dữ liệu phức tạp.
+\end{itemize}
